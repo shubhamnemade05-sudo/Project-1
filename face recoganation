@@ -1,0 +1,281 @@
+import cv2
+import tkinter as tk
+from tkinter import messagebox
+from PIL import Image, ImageTk  # Importing Pillow
+
+# Function to handle button clicks
+import tkinter as tk  #tk means toolkit
+from tkinter import messagebox
+from tkinter import Toplevel
+from PIL import Image, ImageTk  # Importing Pillow
+
+  # Import OpenCV for webcam and face detection
+
+import tkinter as tk
+from tkinter import Toplevel, messagebox
+import cv2
+
+def open_register_window():
+    register_window = Toplevel(root)
+    register_window.title("Register New Person")
+    register_window.geometry("400x500")  # Increased height to accommodate the "Take Photo" button
+
+    label = tk.Label(register_window, text="Register New Person", font=('Arial', 16))
+    label.pack(pady=20)
+
+    # Name Entry
+    name_label = tk.Label(register_window, text="Name:")
+    name_label.pack()
+    name_entry = tk.Entry(register_window)
+    name_entry.pack(pady=5)
+
+    # ID Entry
+    id_label = tk.Label(register_window, text="ID:")
+    id_label.pack()
+    id_entry = tk.Entry(register_window)
+    id_entry.pack(pady=5)
+
+    # Email Entry
+    email_label = tk.Label(register_window, text="Email:")
+    email_label.pack()
+    email_entry = tk.Entry(register_window)
+    email_entry.pack(pady=5)
+
+    # Phone Number Entry
+    phone_label = tk.Label(register_window, text="Phone Number:")
+    phone_label.pack()
+    phone_entry = tk.Entry(register_window)
+    phone_entry.pack(pady=5)
+
+    # Take Photo Button
+    take_photo_button = tk.Button(
+        register_window,
+        text="Take Photo",
+        command=take_photo
+    )
+    take_photo_button.pack(pady=20)
+
+    # Register Button
+    register_button = tk.Button(
+        register_window, 
+        text="Register", 
+        command=lambda: register_person(name_entry.get(), id_entry.get(), email_entry.get(), phone_entry.get())
+    )
+    register_button.pack(pady=20)
+
+def take_photo():
+    # Load the pre-trained face detection model
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    # Open the webcam
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        messagebox.showerror("Error", "Could not open webcam!")
+        return
+
+    while True:
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+
+        if not ret:
+            messagebox.showerror("Error", "Failed to capture image from webcam!")
+            break
+
+        # Convert the frame to grayscale for face detection
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Detect faces in the frame
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+        # Draw rectangles around detected faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # Display the frame with detected faces
+        cv2.imshow("Take Photo - Press SPACE to Capture", frame)
+
+        # Break the loop if SPACE is pressed
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord(' '):  # SPACE key
+            # Save the captured frame as an image
+            cv2.imwrite("captured_photo.jpg", frame)
+            messagebox.showinfo("Success", "Photo Captured Successfully!")
+            break
+
+    # Release the webcam and close the OpenCV window
+    cap.release()
+    cv2.destroyAllWindows()
+
+def register_person(name, id, email, phone):
+    photo_path = "captured_photo.jpg"  # Path to the captured photo
+    print(f"Registering Person:\nName: {name}\nID: {id}\nEmail: {email}\nPhone: {phone}\nPhoto: {photo_path}")
+    messagebox.showinfo("Registration Successful", f"Person {name} registered successfully!")
+
+# Main application window
+root = tk.Tk()
+root.title("Face Registration App")
+root.geometry("300x200")
+
+# Button to open the registration window
+open_register_button = tk.Button(root, text="Open Register Window", command=open_register_window)
+open_register_button.pack(pady=50)
+
+root.mainloop()
+
+
+def open_update_window():
+    update_window = Toplevel(root)
+    update_window.title("Update Information")
+    update_window.geometry("400x300")
+
+    label = tk.Label(update_window, text="Update Person Information", font=('Arial', 16))
+    label.pack(pady=20)
+
+    # You can add widgets for updating information
+    id_label = tk.Label(update_window, text="ID:")
+    id_label.pack()
+    id_entry = tk.Entry(update_window)
+    id_entry.pack(pady=10)
+
+    update_button = tk.Button(update_window, text="Update", command=lambda: print(f"Updating ID: {id_entry.get()}"))
+    update_button.pack(pady=20)
+
+def open_attendance_window():
+    attendance_window = Toplevel(root)
+    attendance_window.title("View Attendance")
+    attendance_window.geometry("400x300")
+
+    label = tk.Label(attendance_window, text="View Attendance", font=('Arial', 16))
+    label.pack(pady=20)
+
+    # Example attendance list (this can be dynamic, pulling from a database)
+    attendance_list = ["John Doe", "Jane Smith", "Alice Johnson", "Bob Brown"]
+    for person in attendance_list:
+        tk.Label(attendance_window, text=person).pack(pady=5)
+
+def close_app():
+    root.quit()
+
+ 
+def close_app():
+    root.quit()
+
+# Function to set background image
+def set_background_image():
+    background_image = Image.open(r"C:\Users\shubh\Downloads\4th Sem Project-20250321T043323Z-001\4th Sem Project\icons\background_icon.jpg")
+    background_image = background_image.resize((screen_width, screen_height))  # Resize to fit screen size
+    background_photo = ImageTk.PhotoImage(background_image)
+
+    background_label = tk.Label(root, image=background_photo)
+    background_label.place(relwidth=1, relheight=1)  # Fill the window with the background image
+
+    # Keep a reference to the image to prevent garbage collection
+    background_label.image = background_photo
+
+
+# Add the line of text at the bottom
+def add_footer_text():
+    footer_text = "Face Recognition Attendance System using Python "
+    
+    # Customize the font, color, and alignment
+    custom_font = ('Arial', 20, 'italic')  # You can change the font and size
+    footer_label = tk.Label(root, text=footer_text, font=custom_font, fg="white", bg="#00796B")
+    
+    # Position the text at the bottom
+    footer_label.place( x= 100,y=700)  # Adjusted `y=-20` for better visibility
+
+# Create the main interface window
+def create_main_interface():
+    global root, screen_width, screen_height
+    root = tk.Tk()
+    root.title("Face Recognition Attendance System")
+    
+    # Get screen width and height to set window size dynamically
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    
+    # Set the window size to fill the screen
+    root.geometry(f"{screen_width}x{screen_height}")
+
+    set_background_image()  # Add the background image
+
+    add_footer_text()  # Add the footer text
+
+    # Set custom font
+    custom_font = ('Helvetica', 14, 'bold')
+
+    # Load images for buttons
+    register_image = Image.open(r"C:\Users\shubh\Downloads\4th Sem Project-20250321T043323Z-001\4th Sem Project\icons\register_icon.png")
+    register_image = register_image.resize((100, 100))  # Resize to button size
+    register_icon = ImageTk.PhotoImage(register_image)
+
+    update_image = Image.open(r"C:\Users\shubh\Downloads\4th Sem Project-20250321T043323Z-001\4th Sem Project\icons\camera1.png")
+    update_image = update_image.resize((100, 100))
+    update_icon = ImageTk.PhotoImage(update_image)
+
+    attendance_image = Image.open(r"C:\Users\shubh\Downloads\4th Sem Project-20250321T043323Z-001\4th Sem Project\icons\attendance_icon.png")
+    attendance_image = attendance_image.resize((100, 100))
+    attendance_icon = ImageTk.PhotoImage(attendance_image)
+
+    exit_image = Image.open(r"C:\Users\shubh\Downloads\4th Sem Project-20250321T043323Z-001\4th Sem Project\icons\exit_icon.png")
+    exit_image = exit_image.resize((100, 100))
+    exit_icon = ImageTk.PhotoImage(exit_image)
+
+    # Register button (First Row, First Column) - With a gap on the left
+    register_button = tk.Button(
+        root, 
+        text="Register Person", 
+        image=register_icon, 
+        compound="top", 
+        font=custom_font, 
+        bg="#4CAF50", 
+        fg="white", 
+        command=open_register_window
+    )
+    register_button.place(x=100, y=100)  # x=100 for left gap, y=100 for some vertical gap
+
+    # Update button (First Row, Second Column) - With a gap on the left
+    update_button = tk.Button(
+        root, 
+        text="Take Attendance", 
+        image=update_icon, 
+        compound="top", 
+        font=custom_font, 
+        bg="#2196F3", 
+        fg="white", 
+        command=open_update_window
+    )
+    update_button.place(x=350, y=100)  # x=350 to position it to the right of Register button
+
+    # Attendance button (Second Row, First Column) - With a gap on the left
+    attendance_button = tk.Button(
+        root, 
+        text="View Attendance", 
+        image=attendance_icon, 
+        compound="top", 
+        font=custom_font, 
+        bg="#FFC107", 
+        fg="white", 
+        command=open_attendance_window
+    )
+    attendance_button.place(x=100, y=300)  # Positioned below Register button, y=250 for vertical distance
+
+    # Exit button (Second Row, Second Column) - With a gap on the left
+    exit_button = tk.Button(
+        root, 
+        text="   Exit   ", 
+        image=exit_icon, 
+        compound="top", 
+        font=custom_font, 
+        bg="#f44336", 
+        fg="white", 
+        command=close_app
+    )
+    exit_button.place(x=350, y=300)  # Positioned below Update button, y=250 for vertical distance
+
+    # Run the Tkinter event loop
+    root.mainloop()
+
+# Call the function to create the main interface
+create_main_interface()
